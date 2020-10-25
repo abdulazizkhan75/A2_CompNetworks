@@ -2,42 +2,61 @@ import socket
 import sys
 import os
 import time
-import random
 import threading
-
 from jobcreator import JobCreatorNode
+import random
 
+def new_client(server_address, client_id):
 
-#creates new client and excecutes tasks obtained from server
-def client_node(server_address):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    print("Connecting {0} to {1}".format(client_socket, server_address))
+    print("Client {0}: Attempting to connect to {1}".format(client_id, server_address[0]))
     client_socket.connect(server_address)
-    
-    keep_connection = True
+    print("Client {0}: Successfully connected to server".format(client_id))
 
-    while keep_connection:
-        job = (client_socket.recv(1024)).decode()
-        
-        response = "COMPLETED {0}".format(job)
-        if (random.randint(1,4) == 1):
-            response = "REJECT"
-        
-        if (job == "AGAIN"):
+    client_socket.sendall(str(client_id).encode())
+
+    try:
+        keep_connection = True
+        while keep_connection:
+            job = (client_socket.recv(1024)).decode()
+            print("Cleint {0}: Recieved job - {1}".format(client_id, job))
+
+            response = "COMPLETED {0}".format(job)
+            if (random.randint(1,4) == 1):
+                response = "REJECT"
+            
+            print("Client {0}: {1}".format(client_id, response))
+            client_socket.sendall(response.encode())
+
+            job = (client_socket.recv(1024)).decode()
+            print("Client {0}: Server asked to do another job".format(client_id))
+
             if (random.randint(1,4) == 1):
                 response = "NO"
                 keep_connection = False
             else:
                 response = "YES"
-        
-        client_socket.send(response.encode())
+            
+            print("Client {0}: Response - {1}".format(client_id, response))
+            client_socket.sendall(response.encode())
 
-    client_socket.close()
- 
- #end client_node()
+        print("Client {0}: Closing connection with server".format(client_id))
+        client_socket.close()
+    except:
+        print("Client {0}: Closing connection with server".format(client_id))
+        client_socket.close()
+
+#end new_client
 
 
+num_of_clients = int(input("How many clients? >"))
 
+server_node = JobCreatorNode()
 
-print("Runs properly")
+server_thread = threading.Thread(target=server_node.startServer, args=())
+server_thread.start()
+
+for i in range(0,num_of_clients):
+    new_client_thread = threading.Thread(target=new_client, args=(server_node.getAddress(), i+1, ))
+    new_client_thread.start()
