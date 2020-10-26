@@ -12,8 +12,6 @@ class JobCreatorNode:
     JOB_TYPES = ["ICMP Request", "Craft and send IP packet", "Craft and send TCP packet", "Send HTTP GET request"]
 
     # Defines the server node. Elements within node:
-    #  node_socket - socket of this node
-    #  server_address - address of this node's connection
     def __init__(self):
         self.server_ip = "localhost"
         self.port_num = 5555
@@ -27,7 +25,7 @@ class JobCreatorNode:
         except:
             print("Could not create server")
 
-    # Starts server and sends intructions (jobs) to connected clients
+    # Starts server and connects with Clients
     def startServer(self):
         if (self.started_server):
             pass
@@ -76,6 +74,7 @@ class JobCreatorNode:
             connection.close()
         except:
             print("Server: Closing connection with client ", client_id)
-
+            
+    #Gets Address of Server 
     def getAddress(self):
         return self.server_address
