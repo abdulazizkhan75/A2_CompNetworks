@@ -57,6 +57,7 @@ def new_client(server_address, client_id):
 #end new_client
 
 
+#might need to open a socket at the start of these
 """
 A3. Q1. #1
 """
