@@ -60,17 +60,27 @@ def new_client(server_address, client_id):
 """
 A3. Q1. #1
 """
+#checks to see if IP address or Host name is online
+def detect_online(des_addr):
+    try:
+        host_name = socket.gethostbyaddr(des_addr)
+        print("Hostname : ", host_name)
+        print("IP : ", des_addr)
+    except:
+        print("IP address is not online")
+#end detect_online
 
-def detect_online():
-    pass
 
 """
 A3. Q1. #2
 """
-
-def detect_status():
-    pass
-
+def detect_status(des_addr, port):
+    check = socket.connect_ex((des_addr, port))
+    if(check == 0):
+        print("port is open")
+    else:
+        print("port is closed")
+#end detect_status
 
 
 """
@@ -82,6 +92,7 @@ def icmp_flood(des_addr, num):
         packet = IP(dst=des_addr)/ICMP()
         send(packet)
 #end icmp_flood
+
 
 """
 A3. Q2. #2
