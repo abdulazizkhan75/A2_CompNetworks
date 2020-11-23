@@ -9,7 +9,7 @@ import random
 # with them through protocols, and exchanges data.
 class JobCreatorNode:
     
-    JOB_TYPES = ["ICMP Request", "Craft and send IP packet", "Craft and send TCP packet", "Send HTTP GET request"]
+    JOB_TYPES = ["11","12","21","22"]
 
     # Defines the server node. Elements within node:
     def __init__(self):
