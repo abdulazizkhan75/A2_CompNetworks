@@ -88,19 +88,20 @@ def detect_online(des_addr):
 A3. Q1. #2
 """
 def detect_status(des_addr, port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         print("reached 12 - 1")
-        check = socket.connect((des_addr, port))
-        print("reached 12 - 1")
+        print("please wait")
+        s = (str(des_addr), int(port))
+        check = sock.connect_ex(s)
         if(check == 0):
-            print("port is open")
+            print("port is OPEN")
         else:
-            print("port is closed")
+            print("port is CLOSED")
     except Exception as e:
-        print("12 failed")
+        print("12 FAILED")
         print(e)
 #end detect_status
-
 
 """
 A3. Q2. #1
@@ -147,8 +148,3 @@ server_thread.start()
 for i in range(0,num_of_clients):
     new_client_thread = threading.Thread(target=new_client, args=(server_node.getAddress(), i+1, ))
     new_client_thread.start()
-
-
-
-
-
